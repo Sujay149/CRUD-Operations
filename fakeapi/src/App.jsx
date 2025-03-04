@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Container, TextField, Button, Table, TableHead, TableRow, TableCell, TableBody, Paper, Radio, RadioGroup, FormControlLabel, FormControl, FormLabel } from '@mui/material';
-import './App.css';
 
 const apiUrl = 'https://jsonplaceholder.typicode.com/users';
 
@@ -13,7 +12,7 @@ function App() {
     email: '',
     phone: '',
     website: '',
-    gender: 'male'
+    gender: 'male',
   });
   const [isEditing, setIsEditing] = useState(false);
 
@@ -24,25 +23,24 @@ function App() {
   const fetchUsers = async () => {
     const response = await fetch(apiUrl);
     const data = await response.json();
-    setUsers(data);
+    const usersWithGender = data.map(user => ({ ...user, gender: 'male' }));
+    setUsers(usersWithGender);
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (isEditing) {
-      await updateUser(formData.id);
-      setIsEditing(false);
+      updateUser(formData.id);
     } else {
-      await createUser();
+      createUser();
     }
+
     setFormData({
       id: null,
       name: '',
@@ -50,129 +48,60 @@ function App() {
       email: '',
       phone: '',
       website: '',
-      gender: 'male'
+      gender: 'male',
     });
+
+    setIsEditing(false);
   };
 
   const createUser = async () => {
-    const response = await fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(formData),
-    });
-    const newUser = await response.json();
+    const newUser = { id: Date.now(), ...formData };
     setUsers([newUser, ...users]);
   };
 
   const updateUser = async (id) => {
-    const response = await fetch(`${apiUrl}/${id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(formData),
-    });
-    const updatedUser = await response.json();
-    setUsers(users.map(user => user.id === id ? updatedUser : user));
+    setUsers(users.map(user => (user.id === id ? { ...user, ...formData } : user)));
   };
 
   const deleteUser = async (id) => {
-    await fetch(`${apiUrl}/${id}`, {
-      method: 'DELETE',
-    });
     setUsers(users.filter(user => user.id !== id));
   };
 
   const editUser = (user) => {
-    setFormData({
-      id: user.id,
-      name: user.name,
-      username: user.username,
-      email: user.email,
-      phone: user.phone,
-      website: user.website,
-      gender: user.gender
-    });
+    setFormData(user);
     setIsEditing(true);
   };
 
   return (
     <Container maxWidth="lg">
-      <h1>CRUD Operations with JSONPlaceholder</h1>
+      <h1>CRUD Operations</h1>
       <Paper style={{ padding: '20px', marginBottom: '20px' }}>
         <form onSubmit={handleSubmit}>
-          <TextField
-            fullWidth
-            label="Name"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            margin="normal"
-          />
-          <TextField
-            fullWidth
-            label="Username"
-            name="username"
-            value={formData.username}
-            onChange={handleChange}
-            margin="normal"
-          />
-          <TextField
-            fullWidth
-            label="Email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            margin="normal"
-          />
-          <TextField
-            fullWidth
-            label="Phone"
-            name="phone"
-            value={formData.phone}
-            onChange={handleChange}
-            margin="normal"
-          />
-          <TextField
-            fullWidth
-            label="Website"
-            name="website"
-            value={formData.website}
-            onChange={handleChange}
-            margin="normal"
-          />
+          <TextField fullWidth label="Name" name="name" value={formData.name} onChange={handleChange} margin="normal" />
+          <TextField fullWidth label="Username" name="username" value={formData.username} onChange={handleChange} margin="normal" />
+          <TextField fullWidth label="Email" name="email" value={formData.email} onChange={handleChange} margin="normal" />
+          <TextField fullWidth label="Phone" name="phone" value={formData.phone} onChange={handleChange} margin="normal" />
+          <TextField fullWidth label="Website" name="website" value={formData.website} onChange={handleChange} margin="normal" />
+          
           <FormControl component="fieldset" margin="normal">
             <FormLabel component="legend">Gender</FormLabel>
-            <RadioGroup
-              row
-              aria-label="gender"
-              name="gender"
-              value={formData.gender}
-              onChange={handleChange}
-            >
+            <RadioGroup row name="gender" value={formData.gender} onChange={handleChange}>
               <FormControlLabel value="male" control={<Radio />} label="Male" />
               <FormControlLabel value="female" control={<Radio />} label="Female" />
             </RadioGroup>
           </FormControl>
+
           <Button type="submit" variant="contained" color="primary" style={{ marginRight: '10px' }}>
             {isEditing ? 'Update User' : 'Create User'}
           </Button>
-          <Button variant="outlined" color="secondary" onClick={() => setFormData({
-            id: null,
-            name: '',
-            username: '',
-            email: '',
-            phone: '',
-            website: '',
-            gender: 'male'
-          })}>
+          <Button variant="outlined" color="secondary" onClick={() => setIsEditing(false)}>
             Reset
           </Button>
         </form>
       </Paper>
+
       <Paper>
+        <h2>Users</h2>
         <Table>
           <TableHead>
             <TableRow>
@@ -187,7 +116,7 @@ function App() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {users.map((user) => (
+            {users.map(user => (
               <TableRow key={user.id}>
                 <TableCell>{user.name}</TableCell>
                 <TableCell>{user.username}</TableCell>
