@@ -35,7 +35,8 @@ function App() {
     });
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     if (isEditing) {
       await updateUser(formData.id);
       setIsEditing(false);
@@ -85,7 +86,15 @@ function App() {
   };
 
   const editUser = (user) => {
-    setFormData(user);
+    setFormData({
+      id: user.id,
+      name: user.name,
+      username: user.username,
+      email: user.email,
+      phone: user.phone,
+      website: user.website,
+      gender: user.gender
+    });
     setIsEditing(true);
   };
 
@@ -93,7 +102,7 @@ function App() {
     <Container maxWidth="lg">
       <h1>CRUD Operations with JSONPlaceholder</h1>
       <Paper style={{ padding: '20px', marginBottom: '20px' }}>
-        <form>
+        <form onSubmit={handleSubmit}>
           <TextField
             fullWidth
             label="Name"
@@ -147,7 +156,7 @@ function App() {
               <FormControlLabel value="female" control={<Radio />} label="Female" />
             </RadioGroup>
           </FormControl>
-          <Button variant="contained" color="primary" onClick={handleSubmit} style={{ marginRight: '10px' }}>
+          <Button type="submit" variant="contained" color="primary" style={{ marginRight: '10px' }}>
             {isEditing ? 'Update User' : 'Create User'}
           </Button>
           <Button variant="outlined" color="secondary" onClick={() => setFormData({
