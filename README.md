@@ -19,8 +19,9 @@ Steps
 Clone the repository:
 
 Copy
-git clone https://github.com/your-username/your-repo-name.git
-cd your-repo-name
+https://github.com/Sujay149/CRUD-Operations.git
+cd CRUD-Operations
+cd fakeapi
 Install dependencies:
 
 Copy
@@ -28,7 +29,7 @@ npm install
 Start the application:
 
 Copy
-npm start
+npm run dev
 Open your browser and navigate to http://localhost:3000 to view the application.
 
 Usage
